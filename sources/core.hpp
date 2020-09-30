@@ -9,3 +9,8 @@ using ui16 = std::uint16_t;
 using ui32 = std::uint32_t;
 
 using f32 = float;
+
+
+#ifndef NDEBUG
+    #define GL_DEBUG_CONTEXT
+#endif // NDEBUG

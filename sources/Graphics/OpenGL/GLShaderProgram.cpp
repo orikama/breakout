@@ -8,8 +8,6 @@
 
 
 auto _createShader(const char* shaderSource, const GLenum shaderType)   -> GLuint;
-auto _checkShaderCompilationStatus(const GLuint shaderID)               -> void;
-auto _checkProgramCompilationStatus(const GLuint shaderID)              -> void;
 
 
 GLShaderProgram::GLShaderProgram()
@@ -34,7 +32,6 @@ GLShaderProgram::GLShaderProgram(const char* vertSource, const char* fragSource,
     }
 
     glLinkProgram(m_programID);
-    _checkProgramCompilationStatus(m_programID);
 
     glDeleteShader(vertID);
     glDeleteShader(fragID);
@@ -131,45 +128,5 @@ GLuint _createShader(const char* shaderSource, const GLenum shaderType)
     glShaderSource(shaderID, 1, &shaderSource, nullptr);
     glCompileShader(shaderID);
 
-    _checkShaderCompilationStatus(shaderID);
-
     return shaderID;
-}
-
-void _checkShaderCompilationStatus(const GLuint shaderID)
-{
-    GLint isCompiled;
-    glGetShaderiv(shaderID, GL_COMPILE_STATUS, &isCompiled);
-
-    if (isCompiled == GL_FALSE) {
-        GLint logLength;
-        glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &logLength);
-
-        //std::unique_ptr<char[]> infoLog(new char[logLength]);
-        auto infoLog = std::make_unique<char[]>(logLength);
-
-        glGetShaderInfoLog(shaderID, logLength, NULL, infoLog.get());
-
-        //infoLog.get()[logLength-2] = '\0';
-        std::cerr << "ERROR::SHADER::COMPILATION_FAILED\n\tInfoLog\n" << infoLog.get() << std::endl;
-    }
-}
-
-void _checkProgramCompilationStatus(const GLuint programID)
-{
-    GLint isCompiled;
-    glGetProgramiv(programID, GL_COMPILE_STATUS, &isCompiled);
-
-    if (isCompiled == GL_FALSE) {
-        GLint logLength;
-        glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &logLength);
-
-        //std::unique_ptr<char[]> infoLog(new char[logLength]);
-        auto infoLog = std::make_unique<char[]>(logLength);
-
-        glGetProgramInfoLog(programID, logLength, NULL, infoLog.get());
-
-        //infoLog.get()[logLength-2] = '\0';
-        std::cerr << "ERROR::SHADER::COMPILATION_FAILED\n\tInfoLog\n" << infoLog.get() << std::endl;
-    }
 }
