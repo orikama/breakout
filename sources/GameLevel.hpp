@@ -15,7 +15,6 @@ public:
 public:
     GameLevel(const char* levelPath, ui32 levelWidth, ui32 levelHeight);
 
-    //void Load(const char* levelPath, ui32 levelWidth, ui32 levelHeight);
     void Draw(const SpriteRenderer& renderer) const;
 
     bool IsCompleted() const;

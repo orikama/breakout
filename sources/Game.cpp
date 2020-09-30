@@ -24,8 +24,8 @@ enum class Direction
 using Collision = std::optional<std::pair<Direction, glm::vec2>>;
 
 
-bool checkCollision(const GameObject& o1, const GameObject& o2);
-Collision checkCollision(const BallObject& o1, const GameObject& o2);
+bool checkCollision(const GameObject& one, const GameObject& two);
+Collision checkCollision(const BallObject& ball, const GameObject& obj);
 Direction getCollisionDirection(glm::vec2 target);
 
 bool shouldSpawn(ui32 chance);
@@ -215,6 +215,7 @@ void Game::DoCollisions()
             if (powerUp.m_position.y >= m_height) {
                 powerUp.m_isDestroyed = true;
             } else if (checkCollision(*m_player, powerUp)) {
+                checkCollision(*m_player, powerUp);
                 powerUp.m_isDestroyed = true;
                 powerUp.m_isActive = true;
                 activatePowerUp(powerUp);
@@ -253,7 +254,6 @@ void Game::ResetPlayerAndBall()
 
 void Game::SpawnPowerUps(const GameObject& block)
 {
-    // TODO: emplace_back()
     // 1 in 75 chance
     if (shouldSpawn(75)) {
         m_powerUps.emplace_back(PowerUp::Type::Speed, ResourceManager::GetTexture("powerup_speed"),
@@ -326,18 +326,18 @@ void Game::UpdatePowerUps(f32 dt)
         }
     }
 
-    /*m_powerUps.erase(std::remove_if(m_powerUps.begin(), m_powerUps.end(),
+    m_powerUps.erase(std::remove_if(m_powerUps.begin(), m_powerUps.end(),
                                     [](const PowerUp& powerUp) {
                                         return powerUp.m_isDestroyed && powerUp.m_isActive == false;
                                     }),
-                     m_powerUps.end());*/
-    for (auto powerUp = m_powerUps.begin(); powerUp != m_powerUps.end(); ) {
+                     m_powerUps.end());
+    /*for (auto powerUp = m_powerUps.begin(); powerUp != m_powerUps.end(); ) {
         if (powerUp->m_isDestroyed && powerUp->m_isActive == false) {
             powerUp = m_powerUps.erase(powerUp);
         } else {
             ++powerUp;
         }
-    }
+    }*/
 }
 
 void Game::activatePowerUp(const PowerUp& powerUp)
@@ -389,24 +389,24 @@ bool Game::isOtherPowerUpActive(PowerUp::Type type) const
 }
 
 
-bool checkCollision(const GameObject& b1, const GameObject& b2)
+bool checkCollision(const GameObject& one, const GameObject& two)
 {
     // NOTE: Why not like this?
     //glm::greaterThanEqual(o1.m_position + o1.m_size, o2.m_position) && glm::greaterThanEqual(o2.m_position + o2.m_size, o1.m_position);
 
-    bool collisionX = b1.m_position.x + b1.m_size.x >= b2.m_position.x
-        && b2.m_position.x + b2.m_size.x >= b2.m_position.x;
-    bool collisionY = b1.m_position.y + b1.m_size.y >= b2.m_position.y
-        && b2.m_position.y + b2.m_size.y >= b1.m_position.y;
+    bool collisionX = one.m_position.x + one.m_size.x >= two.m_position.x
+        && two.m_position.x + two.m_size.x >= one.m_position.x;
+    bool collisionY = one.m_position.y + one.m_size.y >= two.m_position.y
+        && two.m_position.y + two.m_size.y >= one.m_position.y;
 
     return collisionX && collisionY;
 }
 
-Collision checkCollision(const BallObject& c, const GameObject& b)
+Collision checkCollision(const BallObject& ball, const GameObject& obj)
 {
-    const auto circleCenter = c.m_position + c.m_radius;
-    const auto boxHalfExtent = b.m_size / 2.0f;
-    const auto boxCenter = b.m_position + boxHalfExtent;
+    const auto circleCenter = ball.m_position + ball.m_radius;
+    const auto boxHalfExtent = obj.m_size / 2.0f;
+    const auto boxCenter = obj.m_position + boxHalfExtent;
 
     const auto centerDifference = circleCenter - boxCenter;
     const auto clampedDifference = glm::clamp(centerDifference, -boxHalfExtent, boxHalfExtent);
@@ -414,7 +414,7 @@ Collision checkCollision(const BallObject& c, const GameObject& b)
     const auto closest = boxCenter + clampedDifference;
     const auto difference = closest - circleCenter;
 
-    if (glm::length(difference) <= c.m_radius) {
+    if (glm::length(difference) <= ball.m_radius) {
         return { {getCollisionDirection(difference), difference} };
     }
 

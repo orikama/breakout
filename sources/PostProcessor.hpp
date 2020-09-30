@@ -10,10 +10,6 @@
 class PostProcessor
 {
 public:
-    const GLShaderProgram& m_shaderProgram;
-    const GLTexture m_texture;
-    ui32 m_width;
-    ui32 m_height;
     bool m_isConfuse = false;
     bool m_isChaos = false;
     bool m_isShake = false;
@@ -28,6 +24,12 @@ public:
 private:
     void initRenderData();
 
+
+    const GLShaderProgram& m_shaderProgram;
+    const GLTexture m_texture;
+
+    ui32 m_width;
+    ui32 m_height;
 
     ui32 m_FBO;
     ui32 m_multisampledFBO;
