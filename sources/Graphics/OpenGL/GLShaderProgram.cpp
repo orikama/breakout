@@ -12,13 +12,13 @@ auto _createShader(const char* shaderSource, const GLenum shaderType)   -> GLuin
 
 GLShaderProgram::GLShaderProgram()
 {
-    std::cout << "default GLShaderProgram() constructor called\n";
+    //std::cout << "default GLShaderProgram() constructor called\n";
     m_programID = 0;
 }
 
 GLShaderProgram::GLShaderProgram(const char* vertSource, const char* fragSource, const char* geomSource /*= nullptr*/)
 {
-    std::cout << "GLShaderProgram() constructor called\n";
+    //std::cout << "GLShaderProgram() constructor called\n";
 
     const auto vertID = _createShader(vertSource, GL_VERTEX_SHADER);
     const auto fragID = _createShader(fragSource, GL_FRAGMENT_SHADER);
@@ -49,12 +49,12 @@ GLShaderProgram::GLShaderProgram(const char* vertSource, const char* fragSource,
 
 GLShaderProgram::GLShaderProgram(GLShaderProgram&& copy)
 {
-    std::cout << "GLShaderProgram() move copy constructor called\n";
+    //std::cout << "GLShaderProgram() move copy constructor called\n";
     m_programID = copy.m_programID;
 }
 GLShaderProgram& GLShaderProgram::operator=(GLShaderProgram&& copy)
 {
-    std::cout << "GLShaderProgram() move assignment called\n";
+    //std::cout << "GLShaderProgram() move assignment called\n";
     m_programID = copy.m_programID;
     return *this;
 }

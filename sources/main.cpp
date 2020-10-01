@@ -109,11 +109,11 @@ int main()
         previousTime = currentTime;
 
         ++frameCount;
-        /*if (currentTime - lastPrintTime >= 1.0f) {
+        if (currentTime - lastPrintTime >= 1.0f) {
             printf("FPS: %d %f ms\n", frameCount, 1000.0 / frameCount);
             frameCount = 0;
             lastPrintTime += 1.0f;
-        }*/
+        }
 
         glfwPollEvents();
 
@@ -143,6 +143,7 @@ void keyCallback(GLFWwindow* window, i32 key, i32 scancode, i32 action, i32 mode
         }
         else if (action == GLFW_RELEASE) {
             game.m_keys[key] = false;
+            game.m_keysProcessed[key] = false;
         }
     }
 }

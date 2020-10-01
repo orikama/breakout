@@ -7,7 +7,7 @@
 
 GLTexture::GLTexture(const ui32 width, const ui32 height, bool alpha, const ui8* data)
 {
-    std::cout << "GLTexture() constructor called\n";
+    //std::cout << "GLTexture() constructor called\n";
 
     glGenTextures(1, &m_textureID);
     glBindTexture(GL_TEXTURE_2D, m_textureID);

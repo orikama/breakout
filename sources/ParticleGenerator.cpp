@@ -21,19 +21,9 @@ void ParticleGenerator::Update(f32 dt, const GameObject& obj, ui32 newParticles,
         respawnParticle(m_particles[unusedParticle], obj, offset);
     }
 
-    /*for (auto& particle : m_particles) {
-        particle.life -= dt;
-        if (particle.life > 0.0f) {
-            particle.position -= particle.velocity * dt;
-            particle.color.a -= dt * 2.5f;
-        }
-    }*/
-
-    for (ui32 i = 0; i < m_amountOfParticles; ++i) {
-        auto& particle = m_particles[i];
+    for (auto& particle : m_particles) {
         // NOTE: 'life' can go below zero, how far depends on a lot of things, idk if it's affects anything
         particle.life -= dt;
-
         if (particle.life > 0.0f) {
             particle.position -= particle.velocity * dt;
             particle.color.a -= dt * 2.5f;

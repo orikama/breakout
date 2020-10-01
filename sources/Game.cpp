@@ -7,6 +7,7 @@
 #include <utility>
 #include <cmath>
 #include <cstdlib>
+#include <string>
 
 
 constexpr auto kPlayerSize = glm::vec2(100.0f, 20.0f);
@@ -14,6 +15,8 @@ constexpr auto kPlayerVelocity = 500.0f;
 
 constexpr auto kBallRadius = 12.5f;
 constexpr auto kBallInitialVelocity = glm::vec2(100.0f, -350.0f);
+
+constexpr ui32 kPlayerStartLives = 3;
 
 
 enum class Direction
@@ -34,14 +37,16 @@ bool shouldSpawn(ui32 chance);
 Game::Game(ui32 width, ui32 height)
     : m_width(width)
     , m_height(height)
-    , m_gameState(GameState::Active)
+    , m_gameState(GameState::Menu)
+    , m_playerLives(kPlayerStartLives)
 {
     // SHADERS
-    auto projection = glm::ortho<f32>(0.0f, width, height, 0.0f, -1.0f, 1.0f);
-
     ResourceManager::LoadShaderProgram("sprite", "shaders/sprite.vert", "shaders/sprite.frag");
     ResourceManager::LoadShaderProgram("particle", "shaders/particle.vert", "shaders/particle.frag");
     ResourceManager::LoadShaderProgram("postprocess", "shaders/postprocess.vert", "shaders/postprocess.frag");
+    ResourceManager::LoadShaderProgram("text", "shaders/text.vert", "shaders/text.frag");
+
+    auto projection = glm::ortho<f32>(0.0f, width, height, 0.0f, -1.0f, 1.0f);
 
     const auto& spriteShader = ResourceManager::GetShaderProgram("sprite");
     spriteShader.Bind();
@@ -51,6 +56,12 @@ Game::Game(ui32 width, ui32 height)
     particleShader.Bind();
     particleShader.SetMatrix4("u_projection", projection);
     particleShader.SetInt1("u_texture", 0);
+    const auto& textShader = ResourceManager::GetShaderProgram("text");
+    // NOTE: Another projection matrix. Why? Nobody knows
+    auto projection2 = glm::ortho<f32>(0.0f, width, height, 0.0f);
+    textShader.Bind();
+    textShader.SetMatrix4("u_projection", projection2);
+    textShader.SetInt1("u_texture", 0);
 
     // TEXTURES
     ResourceManager::LoadTexture("background", false, "textures/background.jpg");
@@ -77,6 +88,8 @@ Game::Game(ui32 width, ui32 height)
     m_renderer = std::make_unique<SpriteRenderer>(spriteShader);
     m_particleGenerator = std::make_unique<ParticleGenerator>(particleShader, ResourceManager::GetTexture("particle"), 1000.0f);
     m_postProcessor = std::make_unique<PostProcessor>(ResourceManager::GetShaderProgram("postprocess"), width, height);
+    m_textRenderer = std::make_unique<TextRenderer>(textShader);
+    m_textRenderer->Load("fonts/ocraext.ttf", 24);
 
     // GAME OBJECTS
     const auto playerPosition = glm::vec2((width - kPlayerSize.x) / 2.0f, height - kPlayerSize.y);
@@ -90,32 +103,56 @@ Game::Game(ui32 width, ui32 height)
 
 void Game::ProcessInput(f32 dt)
 {
-    if (m_gameState == GameState::Active) {
-        auto velocity = kPlayerVelocity * dt;
+    switch(m_gameState) {
+        case GameState::Active: {
+                auto velocity = kPlayerVelocity * dt;
 
-        // TODO: Remove hardcoded key codes
-        if (m_keys[65]) {   // 'A'
-            // FIXME: WTF IS THIS, why we not take in to account player size, or velocity.
-            //  Player can get go off-scrren
-            if (m_player->m_position.x >= 0.0f) {
-                m_player->m_position.x -= velocity;
-                if (m_ball->m_isStuck) {
-                    m_ball->m_position.x -= velocity;
+                // TODO: Remove hardcoded key codes
+                if (m_keys[65]) {   // 'A'
+                    // FIXME: WTF IS THIS, why we not take in to account player size, or velocity.
+                    //  Player can get go off-scrren
+                    if (m_player->m_position.x >= 0.0f) {
+                        m_player->m_position.x -= velocity;
+                        if (m_ball->m_isStuck) {
+                            m_ball->m_position.x -= velocity;
+                        }
+                    }
                 }
-            }
-        }
-        if (m_keys[68]) {   // 'D'
-            if (m_player->m_position.x <= m_width - m_player->m_size.x) {
-                m_player->m_position.x += velocity;
-                if (m_ball->m_isStuck) {
-                    m_ball->m_position.x += velocity;
+                if (m_keys[68]) {   // 'D'
+                    if (m_player->m_position.x <= m_width - m_player->m_size.x) {
+                        m_player->m_position.x += velocity;
+                        if (m_ball->m_isStuck) {
+                            m_ball->m_position.x += velocity;
+                        }
+                    }
                 }
-            }
-        }
 
-        if (m_keys[32]) {   // SPACE
-            m_ball->m_isStuck = false;
-        }
+                if (m_keys[32]) {   // SPACE
+                    m_ball->m_isStuck = false;
+                }
+                break;
+            }
+        case GameState::Menu: {
+                if (m_keys[257] && m_keysProcessed[257] == false) {  // ENTER
+                    m_gameState = GameState::Active;
+                    m_keysProcessed[257] = true;
+                } else if (m_keys[87] && m_keysProcessed[87] == false) { // 'W'
+                    m_currentLevel = (m_currentLevel + 1) % 4;
+                    m_keysProcessed[87] = true;
+                } else if (m_keys[83] && m_keysProcessed[83] == false) { // 'S'
+                    m_currentLevel = m_currentLevel > 0 ? m_currentLevel - 1 : 3;
+                    m_keysProcessed[83] = true;
+                }
+                break;
+            }
+        case GameState::Win: {
+                if (m_keys[257]) {  // ENTER
+                    m_gameState = GameState::Menu;
+                    m_postProcessor->m_isChaos = false;
+                    m_keysProcessed[257] = true;
+                }
+                break;
+            }
     }
 }
 
@@ -138,14 +175,26 @@ void Game::Update(f32 dt)
 
     // did ball reach bottom edge?
     if (m_ball->m_position.y >= m_height) {
+        --m_playerLives;
+        if (m_playerLives == 0) {
+            m_playerLives = kPlayerStartLives;
+            m_levels[m_currentLevel].Reset();
+            m_gameState = GameState::Menu;
+        }
         ResetPlayerAndBall();
+    }
+
+    if (m_gameState == GameState::Active && m_levels[m_currentLevel].IsCompleted()) {
+        m_gameState = GameState::Win;
         m_levels[m_currentLevel].Reset();
+        ResetPlayerAndBall();
+        m_postProcessor->m_isChaos = true;
     }
 }
 
 void Game::Render(f32 time)
 {
-    if (m_gameState == GameState::Active) {
+    //if (m_gameState == GameState::Active) {
         m_postProcessor->BeginRender();
         {
             m_renderer->DrawSprite(ResourceManager::GetTexture("background"),
@@ -164,6 +213,15 @@ void Game::Render(f32 time)
         }
         m_postProcessor->EndRender();
         m_postProcessor->Render(time);
+        // NOTE: fmt would help
+        m_textRenderer->Render("Lives: " + std::to_string(m_playerLives), 5.0f, 5.0f, 1.0f);
+    //}
+    if (m_gameState == GameState::Menu) {
+        m_textRenderer->Render("Press ENTER to start", 250.0f, m_height / 2.0f, 1.0f);
+        m_textRenderer->Render("Press W or S to select level", 245.0f, m_height / 2.0f + 20.0f, 0.75f);
+    } else if (m_gameState == GameState::Win) {
+        m_textRenderer->Render("You WON!!!", 320.0f, m_height / 2.0f - 20.0f, 1.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+        m_textRenderer->Render("Press ENTER to retry or ESC to quit", 130.0f, m_height / 2.0f, 1.0f, glm::vec3(1.0f, 1.0f, 0.0f));
     }
 }
 

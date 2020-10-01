@@ -17,6 +17,7 @@ endif()
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
+find_package(Freetype CONFIG REQUIRED)
 
 
 set(breakout_SRC_DIR "${PROJECT_SOURCE_DIR}/sources")
@@ -39,7 +40,9 @@ set(breakout_SRC ${breakout_SRC_DIR}/main.cpp
                  ${breakout_SRC_DIR}/ParticleGenerator.hpp
                  ${breakout_SRC_DIR}/ParticleGenerator.cpp
                  ${breakout_SRC_DIR}/PostProcessor.hpp
-                 ${breakout_SRC_DIR}/PostProcessor.cpp)
+                 ${breakout_SRC_DIR}/PostProcessor.cpp
+                 ${breakout_SRC_DIR}/TextRenderer.hpp
+                 ${breakout_SRC_DIR}/TextRenderer.cpp)
 
 set(graphics_SRC_DIR "${breakout_SRC_DIR}/Graphics")
 
@@ -60,5 +63,6 @@ target_include_directories(breakout PRIVATE ${breakout_SRC_DIR} ${third_party_SR
 target_link_libraries(breakout #${Vulkan_LIBRARIES}
                                glfw
                                glm
-                               glad::glad)
+                               glad::glad
+                               freetype)
 target_compile_features(breakout PRIVATE cxx_std_20)
