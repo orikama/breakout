@@ -16,7 +16,6 @@ public:
     TextRenderer(const GLShaderProgram& shaderProgram);
 
     void Load(const char* fontPath, ui32 fontSize);
-
     void Render(const std::string_view text, f32 x, f32 y, f32 scale, glm::vec3 color = glm::vec3(1.0f));
 
 private:

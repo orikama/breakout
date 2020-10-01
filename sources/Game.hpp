@@ -12,15 +12,9 @@
 #include <memory>
 
 
-
 class Game
 {
 public:
-    enum class GameState : ui8
-    {
-        Active, Menu, Win
-    };
-
     bool m_keys[300] = {};
     bool m_keysProcessed[300] = {};
 
@@ -28,22 +22,26 @@ public:
     Game(ui32 width, ui32 height);
     ~Game() = default;
 
-    //void Init();
-
     void ProcessInput(f32 dt);
     void Update(f32 dt);
     void Render(f32 time);
 
+private:
+    enum class GameState : ui8
+    {
+        Active, Menu, Win
+    };
+
+
     void DoCollisions();
 
-    void ResetPlayerAndBall();
+    void resetPlayerAndBall();
 
-    void SpawnPowerUps(const GameObject& brick);
-    void UpdatePowerUps(f32 dt);
-
-private:
     void activatePowerUp(const PowerUp& powerUp);
     bool isOtherPowerUpActive(PowerUp::Type type) const;
+    void spawnPowerUps(const GameObject& brick);
+    void updatePowerUps(f32 dt);
+
 
     std::unique_ptr<SpriteRenderer> m_renderer;
     std::unique_ptr<ParticleGenerator> m_particleGenerator;

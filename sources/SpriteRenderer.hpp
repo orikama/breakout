@@ -25,6 +25,7 @@ public:
 private:
     void initRenderData();
 
+
     const GLShaderProgram& m_shaderProgram;
     ui32 m_quadVAO;
 };

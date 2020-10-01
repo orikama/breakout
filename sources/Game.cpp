@@ -86,7 +86,7 @@ Game::Game(ui32 width, ui32 height)
 
     // SYSTEMS
     m_renderer = std::make_unique<SpriteRenderer>(spriteShader);
-    m_particleGenerator = std::make_unique<ParticleGenerator>(particleShader, ResourceManager::GetTexture("particle"), 1000.0f);
+    m_particleGenerator = std::make_unique<ParticleGenerator>(particleShader, ResourceManager::GetTexture("particle"), 1500.0f);
     m_postProcessor = std::make_unique<PostProcessor>(ResourceManager::GetShaderProgram("postprocess"), width, height);
     m_textRenderer = std::make_unique<TextRenderer>(textShader);
     m_textRenderer->Load("fonts/ocraext.ttf", 24);
@@ -164,7 +164,7 @@ void Game::Update(f32 dt)
 
     m_particleGenerator->Update(dt, *m_ball, 2, glm::vec2(m_ball->m_radius / 2.0f));
 
-    UpdatePowerUps(dt);
+    updatePowerUps(dt);
 
     if (m_shakeTime > 0.0f) {
         m_shakeTime -= dt;
@@ -181,13 +181,13 @@ void Game::Update(f32 dt)
             m_levels[m_currentLevel].Reset();
             m_gameState = GameState::Menu;
         }
-        ResetPlayerAndBall();
+        resetPlayerAndBall();
     }
 
     if (m_gameState == GameState::Active && m_levels[m_currentLevel].IsCompleted()) {
         m_gameState = GameState::Win;
         m_levels[m_currentLevel].Reset();
-        ResetPlayerAndBall();
+        resetPlayerAndBall();
         m_postProcessor->m_isChaos = true;
     }
 }
@@ -235,7 +235,7 @@ void Game::DoCollisions()
             if (const auto collision = checkCollision(*m_ball, brick); collision.has_value()) {
                 if (brick.m_isSolid == false) {
                     brick.m_isDestroyed = true;
-                    SpawnPowerUps(brick);
+                    spawnPowerUps(brick);
                 } else {
                     m_shakeTime = 0.5f;
                     m_postProcessor->m_isShake = true;
@@ -300,7 +300,7 @@ void Game::DoCollisions()
 }
 
 
-void Game::ResetPlayerAndBall()
+void Game::resetPlayerAndBall()
 {
     m_player->m_size = kPlayerSize;
     m_player->m_position = glm::vec2((m_width - kPlayerSize.x) / 2.0f, m_height - kPlayerSize.y);
@@ -310,7 +310,7 @@ void Game::ResetPlayerAndBall()
 }
 
 
-void Game::SpawnPowerUps(const GameObject& block)
+void Game::spawnPowerUps(const GameObject& block)
 {
     // 1 in 75 chance
     if (shouldSpawn(75)) {
@@ -340,7 +340,7 @@ void Game::SpawnPowerUps(const GameObject& block)
     }
 }
 
-void Game::UpdatePowerUps(f32 dt)
+void Game::updatePowerUps(f32 dt)
 {
     for (auto& powerUp : m_powerUps) {
         if (powerUp.m_isDestroyed == false) {

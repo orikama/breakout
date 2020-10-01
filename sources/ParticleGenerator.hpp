@@ -7,7 +7,10 @@
 
 #include <vector>
 
-
+// TODO: Amount of particles should not depend on frame rate.
+//  Probably just expand vector if it hits the limit.
+//  Or it would be better to track how many particles to spawn in the current frame.
+//  No need to spawn thousands of them every frame
 class ParticleGenerator
 {
 public:

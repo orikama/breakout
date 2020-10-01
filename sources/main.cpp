@@ -119,7 +119,6 @@ int main()
 
         g_breakout.ProcessInput(deltaTime);
         g_breakout.Update(deltaTime);
-
         g_breakout.Render(glfwGetTime());
 
         glfwSwapBuffers(window);
