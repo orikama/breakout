@@ -1,5 +1,7 @@
 #include "PostProcessor.hpp"
 
+#include "Graphics/Renderer2D.hpp"
+
 #include <glad/glad.h>
 
 #include <iostream>
@@ -31,7 +33,19 @@ PostProcessor::PostProcessor(const GLShaderProgram& shaderProgram, ui32 width, u
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    initRenderData();
+
+    const f32 vertices[] = {
+        -1.0f, -1.0f, 0.0f, 0.0f,
+         1.0f,  1.0f, 1.0f, 1.0f,
+        -1.0f,  1.0f, 0.0f, 1.0f,
+
+        -1.0f, -1.0f, 0.0f, 0.0f,
+         1.0f, -1.0f, 1.0f, 0.0f,
+         1.0f,  1.0f, 1.0f, 1.0f
+    };
+
+    m_quadVertices = GLBuffer(sizeof(vertices), vertices);
+
 
     constexpr auto offset = 1.0f / 300.0f;
     const f32 offsets[9][2] = {
@@ -88,39 +102,9 @@ void PostProcessor::Render(f32 time)
     m_shaderProgram.SetInt1("u_chaos", m_isChaos);
     m_shaderProgram.SetInt1("u_shake", m_isShake);
 
-    glActiveTexture(GL_TEXTURE0);
-    m_texture.Bind();
-    glBindVertexArray(m_quadVAO);
+    m_texture.Bind(0);
+
+    m_quadVertices.Bind();
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    glBindVertexArray(0);
-}
-
-
-// NOTE: The name has changed, but I still think I've seen this somewhere before
-void PostProcessor::initRenderData()
-{
-    const f32 vertices[] = {
-        -1.0f, -1.0f, 0.0f, 0.0f,
-         1.0f,  1.0f, 1.0f, 1.0f,
-        -1.0f,  1.0f, 0.0f, 1.0f,
-
-        -1.0f, -1.0f, 0.0f, 0.0f,
-         1.0f, -1.0f, 1.0f, 0.0f,
-         1.0f,  1.0f, 1.0f, 1.0f
-    };
-
-    GLuint vbo;
-    glGenVertexArrays(1, &m_quadVAO);
-    glGenBuffers(1, &vbo);
-
-    glBindVertexArray(m_quadVAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(f32), nullptr);
-    glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    //glBindVertexArray(0);
 }

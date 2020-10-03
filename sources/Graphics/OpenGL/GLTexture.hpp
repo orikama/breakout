@@ -15,7 +15,7 @@ public:
     GLTexture& operator=(const GLTexture&);
     GLTexture& operator=(GLTexture&&);*/
 
-    void Bind() const;
+    void Bind(ui32 unit) const;
 
 //private:
     ui32 m_textureID;

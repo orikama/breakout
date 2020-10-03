@@ -9,22 +9,22 @@ GLTexture::GLTexture(const ui32 width, const ui32 height, bool alpha, const ui8*
 {
     //std::cout << "GLTexture() constructor called\n";
 
-    glGenTextures(1, &m_textureID);
-    glBindTexture(GL_TEXTURE_2D, m_textureID);
+    glCreateTextures(GL_TEXTURE_2D, 1, &m_textureID);
 
-    // TODO: use modern opengl: glTextureStorage2d(), glTextureParameteri(), glTextureSubImage2D()
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTextureParameteri(m_textureID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTextureParameteri(m_textureID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTextureParameteri(m_textureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTextureParameteri(m_textureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     if (alpha) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glTextureStorage2D(m_textureID, 1, GL_RGBA8, width, height);
+        glTextureSubImage2D(m_textureID, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
     } else {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTextureStorage2D(m_textureID, 1, GL_RGB8, width, height);
+        glTextureSubImage2D(m_textureID, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, data);
     }
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+    //glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 // NOTE: I guess can be more effective if I make a static method DeleteTextures() that will delete all textures at once,
@@ -53,8 +53,7 @@ GLTexture::GLTexture(const ui32 width, const ui32 height, bool alpha, const ui8*
 //}
 
 
-void GLTexture::Bind() const
+void GLTexture::Bind(ui32 unit) const
 {
-    // TODO: use glBindTextureUnit()
-    glBindTexture(GL_TEXTURE_2D, m_textureID);
+    glBindTextureUnit(unit, m_textureID);
 }

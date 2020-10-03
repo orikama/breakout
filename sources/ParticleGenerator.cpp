@@ -1,5 +1,7 @@
 #include "ParticleGenerator.hpp"
 
+#include "Graphics/Renderer2D.hpp"
+
 #include <glad/glad.h>
 
 #include <cstdlib>
@@ -11,7 +13,18 @@ ParticleGenerator::ParticleGenerator(const GLShaderProgram& shaderProgram, const
     , m_amountOfParticles(amountOfParticles)
 {
     m_particles.resize(amountOfParticles);
-    initVAO();
+
+    const f32 vertices[] = {
+        0.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f,
+
+        0.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, 1.0f, 1.0f, 1.0f,
+        1.0f, 0.0f, 1.0f, 0.0f
+    };
+
+    m_quadVertices = GLBuffer(sizeof(vertices), vertices);
 }
 
 void ParticleGenerator::Update(f32 dt, const GameObject& obj, ui32 newParticles, glm::vec2 offset /*= { 0.0f, 0.0f }*/)
@@ -36,8 +49,8 @@ void ParticleGenerator::Draw() const
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
     m_shaderProgram.Bind();
-    m_texture.Bind();
-    glBindVertexArray(m_quadVAO);
+    m_texture.Bind(0);
+    m_quadVertices.Bind();
 
     for (const auto& particle : m_particles) {
         if (particle.life > 0.0f) {
@@ -47,39 +60,10 @@ void ParticleGenerator::Draw() const
         }
     }
 
-    glBindVertexArray(0);
+    //glBindVertexArray(0);
     // NOTE: I guess technically I should first backup old glBlendFunc state (through glGet()),
     //  set new one and at the end reset it to previous one
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
-
-
-void ParticleGenerator::initVAO()
-{
-    const f32 vertices[] = {
-        0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-
-        0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 1.0f, 1.0f, 1.0f,
-        1.0f, 0.0f, 1.0f, 0.0f
-    };
-
-    GLuint vbo;
-    glGenVertexArrays(1, &m_quadVAO);
-    glGenBuffers(1, &vbo);
-
-    glBindVertexArray(m_quadVAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(f32), nullptr);
-    glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
 }
 
 

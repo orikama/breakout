@@ -12,5 +12,5 @@ using f32 = float;
 
 
 #ifndef NDEBUG
-    #define GL_DEBUG_CONTEXT
+    #define GL_ENABLE_DEBUG_CONTEXT
 #endif // NDEBUG

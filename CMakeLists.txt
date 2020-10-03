@@ -35,8 +35,6 @@ set(breakout_SRC ${breakout_SRC_DIR}/main.cpp
                  ${breakout_SRC_DIR}/PowerUp.cpp
                  ${breakout_SRC_DIR}/ResourceManager.hpp
                  ${breakout_SRC_DIR}/ResourceManager.cpp
-                 ${breakout_SRC_DIR}/SpriteRenderer.hpp
-                 ${breakout_SRC_DIR}/SpriteRenderer.cpp
                  ${breakout_SRC_DIR}/ParticleGenerator.hpp
                  ${breakout_SRC_DIR}/ParticleGenerator.cpp
                  ${breakout_SRC_DIR}/PostProcessor.hpp
@@ -44,13 +42,22 @@ set(breakout_SRC ${breakout_SRC_DIR}/main.cpp
                  ${breakout_SRC_DIR}/TextRenderer.hpp
                  ${breakout_SRC_DIR}/TextRenderer.cpp)
 
+
 set(graphics_SRC_DIR "${breakout_SRC_DIR}/Graphics")
 
 set(graphics_gl_SRC_DIR "${graphics_SRC_DIR}/OpenGL")
-set(graphics_gl_SRC ${graphics_gl_SRC_DIR}/GLShaderProgram.hpp
+set(graphics_gl_SRC ${graphics_gl_SRC_DIR}/GLBackend.hpp
+                    ${graphics_gl_SRC_DIR}/GLBackend.cpp
+                    ${graphics_gl_SRC_DIR}/GLBuffer.hpp
+                    ${graphics_gl_SRC_DIR}/GLBuffer.cpp
+                    ${graphics_gl_SRC_DIR}/GLShaderProgram.hpp
                     ${graphics_gl_SRC_DIR}/GLShaderProgram.cpp
                     ${graphics_gl_SRC_DIR}/GLTexture.hpp
                     ${graphics_gl_SRC_DIR}/GLTexture.cpp)
+
+set(graphics_SRC ${graphics_gl_SRC}
+                 ${graphics_SRC_DIR}/Renderer2D.hpp
+                 ${graphics_SRC_DIR}/Renderer2D.cpp)
 
 
 set(third_party_SRC_DIR "${breakout_SRC_DIR}/third_party")
@@ -58,7 +65,7 @@ set(third_party_SRC ${third_party_SRC_DIR}/stb/stb_image.h
                     ${third_party_SRC_DIR}/stb/stb_image.cpp)
 
 
-add_executable(breakout ${breakout_SRC} ${graphics_gl_SRC} ${third_party_SRC})
+add_executable(breakout ${breakout_SRC} ${graphics_SRC} ${third_party_SRC})
 target_include_directories(breakout PRIVATE ${breakout_SRC_DIR} ${third_party_SRC_DIR}) #${Vulkan_INCLUDE_DIRS})
 target_link_libraries(breakout #${Vulkan_LIBRARIES}
                                glfw

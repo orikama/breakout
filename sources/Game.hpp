@@ -1,7 +1,6 @@
 #pragma once
 
 #include "core.hpp"
-#include "SpriteRenderer.hpp"
 #include "ParticleGenerator.hpp"
 #include "PostProcessor.hpp"
 #include "TextRenderer.hpp"
@@ -43,7 +42,6 @@ private:
     void updatePowerUps(f32 dt);
 
 
-    std::unique_ptr<SpriteRenderer> m_renderer;
     std::unique_ptr<ParticleGenerator> m_particleGenerator;
     std::unique_ptr<PostProcessor> m_postProcessor;
     std::unique_ptr<TextRenderer> m_textRenderer;

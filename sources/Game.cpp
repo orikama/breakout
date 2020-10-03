@@ -1,4 +1,6 @@
 #include "Game.hpp"
+
+#include "Graphics/Renderer2D.hpp"
 #include "ResourceManager.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -40,18 +42,19 @@ Game::Game(ui32 width, ui32 height)
     , m_gameState(GameState::Menu)
     , m_playerLives(kPlayerStartLives)
 {
+    auto projection = glm::ortho<f32>(0.0f, width, height, 0.0f, -1.0f, 1.0f);
+
+
+    Renderer2D::Init(projection);
+    Renderer2D::SetViewport(0, 0, width, height);
+
+
     // SHADERS
-    ResourceManager::LoadShaderProgram("sprite", "shaders/sprite.vert", "shaders/sprite.frag");
     ResourceManager::LoadShaderProgram("particle", "shaders/particle.vert", "shaders/particle.frag");
     ResourceManager::LoadShaderProgram("postprocess", "shaders/postprocess.vert", "shaders/postprocess.frag");
     ResourceManager::LoadShaderProgram("text", "shaders/text.vert", "shaders/text.frag");
 
-    auto projection = glm::ortho<f32>(0.0f, width, height, 0.0f, -1.0f, 1.0f);
 
-    const auto& spriteShader = ResourceManager::GetShaderProgram("sprite");
-    spriteShader.Bind();
-    spriteShader.SetMatrix4("u_projection", projection);
-    spriteShader.SetInt1("u_texture", 0);
     const auto& particleShader = ResourceManager::GetShaderProgram("particle");
     particleShader.Bind();
     particleShader.SetMatrix4("u_projection", projection);
@@ -79,13 +82,13 @@ Game::Game(ui32 width, ui32 height)
     ResourceManager::LoadTexture("powerup_chaos", true, "textures/powerup_chaos.png");
 
     // LEVELS
+    m_levels.emplace_back("levels/perf_test.lvl", width, height / 2);
     m_levels.emplace_back("levels/1.lvl", width, height / 2);
     m_levels.emplace_back("levels/2.lvl", width, height / 2);
     m_levels.emplace_back("levels/3.lvl", width, height / 2);
     m_levels.emplace_back("levels/4.lvl", width, height / 2);
 
     // SYSTEMS
-    m_renderer = std::make_unique<SpriteRenderer>(spriteShader);
     m_particleGenerator = std::make_unique<ParticleGenerator>(particleShader, ResourceManager::GetTexture("particle"), 1500.0f);
     m_postProcessor = std::make_unique<PostProcessor>(ResourceManager::GetShaderProgram("postprocess"), width, height);
     m_textRenderer = std::make_unique<TextRenderer>(textShader);
@@ -197,25 +200,26 @@ void Game::Render(f32 time)
     //if (m_gameState == GameState::Active) {
         m_postProcessor->BeginRender();
         {
-            m_renderer->DrawSprite(ResourceManager::GetTexture("background"),
-                                   glm::vec2(0.0f), glm::vec2(m_width, m_height));
-            m_levels[m_currentLevel].Draw(*m_renderer);
-            m_player->Draw(*m_renderer);
+            Renderer2D::DrawQuad(ResourceManager::GetTexture("background"),
+                                 glm::vec2(0.0f), glm::vec2(m_width, m_height));
+            m_levels[m_currentLevel].Draw();
+            m_player->Draw();
 
             for (const auto& powerUp : m_powerUps) {
                 if (powerUp.m_isDestroyed == false) {
-                    powerUp.Draw(*m_renderer);
+                    powerUp.Draw();
                 }
             }
 
             m_particleGenerator->Draw();
-            m_ball->Draw(*m_renderer);
+            m_ball->Draw();
         }
         m_postProcessor->EndRender();
         m_postProcessor->Render(time);
         // NOTE: fmt would help
         m_textRenderer->Render("Lives: " + std::to_string(m_playerLives), 5.0f, 5.0f, 1.0f);
     //}
+
     if (m_gameState == GameState::Menu) {
         m_textRenderer->Render("Press ENTER to start", 250.0f, m_height / 2.0f, 1.0f);
         m_textRenderer->Render("Press W or S to select level", 245.0f, m_height / 2.0f + 20.0f, 0.75f);

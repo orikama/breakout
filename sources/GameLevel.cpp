@@ -23,11 +23,11 @@ GameLevel::GameLevel(const char* levelPath, ui32 levelWidth, ui32 levelHeight)
     levelDataToGameObjects(levelData, levelWidth, levelHeight);
 }
 
-void GameLevel::Draw(const SpriteRenderer& renderer) const
+void GameLevel::Draw(/*const SpriteRenderer& renderer*/) const
 {
     for (const auto& brick : m_bricks) {
         if (brick.m_isDestroyed == false) {
-            brick.Draw(renderer);
+            brick.Draw();
         }
     }
 }

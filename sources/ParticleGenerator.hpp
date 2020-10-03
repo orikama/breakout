@@ -1,11 +1,13 @@
 #pragma once
 
 #include "core.hpp"
+#include "Graphics/OpenGL/GLBuffer.hpp"
 #include "Graphics/OpenGL/GLShaderProgram.hpp"
 #include "Graphics/OpenGL/GLTexture.hpp"
 #include "GameObject.hpp"
 
 #include <vector>
+
 
 // TODO: Amount of particles should not depend on frame rate.
 //  Probably just expand vector if it hits the limit.
@@ -31,14 +33,13 @@ private:
     };
 
 
-    void initVAO();
     ui32 firstUnusedParticle() const;
     void respawnParticle(Particle& particle, const GameObject& obj, glm::vec2 offset);
 
 
     const GLShaderProgram& m_shaderProgram;
     const GLTexture& m_texture;
-    ui32 m_quadVAO;
+    GLBuffer m_quadVertices;
 
     std::vector<Particle> m_particles;
     ui32 m_amountOfParticles;

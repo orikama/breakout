@@ -1,5 +1,7 @@
 #include "GameObject.hpp"
 
+#include "Graphics/Renderer2D.hpp"
+
 
 GameObject::GameObject(const GLTexture& texture, bool isSolid,
                        glm::vec2 position, glm::vec2 size,
@@ -14,7 +16,7 @@ GameObject::GameObject(const GLTexture& texture, bool isSolid,
 {}
 
 
-void GameObject::Draw(const SpriteRenderer& renderer) const
+void GameObject::Draw() const
 {
-    renderer.DrawSprite(m_texture, m_position, m_size, m_rotation, m_color);
+    Renderer2D::DrawQuad(m_texture, m_position, m_size, m_rotation, m_color);
 }

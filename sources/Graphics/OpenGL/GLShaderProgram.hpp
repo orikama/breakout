@@ -13,10 +13,10 @@ public:
     GLShaderProgram(const char* vertSource, const char* fragSource, const char* geomSource = nullptr);
     //~GLShaderProgram();
 
-    GLShaderProgram(const GLShaderProgram& copy) = delete;
-    GLShaderProgram(GLShaderProgram&& copy);
-    GLShaderProgram& operator=(const GLShaderProgram& copy) = delete;
-    GLShaderProgram& operator=(GLShaderProgram&& copy);
+    //GLShaderProgram(const GLShaderProgram& copy) = delete;
+    //GLShaderProgram(GLShaderProgram&& copy);
+    //GLShaderProgram& operator=(const GLShaderProgram& copy) = delete;
+    //GLShaderProgram& operator=(GLShaderProgram&& copy);
 
     void Bind() const;
 

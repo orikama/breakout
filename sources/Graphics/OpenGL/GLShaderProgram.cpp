@@ -47,17 +47,17 @@ GLShaderProgram::GLShaderProgram(const char* vertSource, const char* fragSource,
 //}
 
 
-GLShaderProgram::GLShaderProgram(GLShaderProgram&& copy)
-{
-    //std::cout << "GLShaderProgram() move copy constructor called\n";
-    m_programID = copy.m_programID;
-}
-GLShaderProgram& GLShaderProgram::operator=(GLShaderProgram&& copy)
-{
-    //std::cout << "GLShaderProgram() move assignment called\n";
-    m_programID = copy.m_programID;
-    return *this;
-}
+//GLShaderProgram::GLShaderProgram(GLShaderProgram&& copy)
+//{
+//    //std::cout << "GLShaderProgram() move copy constructor called\n";
+//    m_programID = copy.m_programID;
+//}
+//GLShaderProgram& GLShaderProgram::operator=(GLShaderProgram&& copy)
+//{
+//    //std::cout << "GLShaderProgram() move assignment called\n";
+//    m_programID = copy.m_programID;
+//    return *this;
+//}
 
 
 void GLShaderProgram::Bind() const
