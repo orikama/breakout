@@ -50,15 +50,10 @@ Game::Game(ui32 width, ui32 height)
 
 
     // SHADERS
-    ResourceManager::LoadShaderProgram("particle", "shaders/particle.vert", "shaders/particle.frag");
     ResourceManager::LoadShaderProgram("postprocess", "shaders/postprocess.vert", "shaders/postprocess.frag");
     ResourceManager::LoadShaderProgram("text", "shaders/text.vert", "shaders/text.frag");
 
 
-    const auto& particleShader = ResourceManager::GetShaderProgram("particle");
-    particleShader.Bind();
-    particleShader.SetMatrix4("u_projection", projection);
-    particleShader.SetInt1("u_texture", 0);
     const auto& textShader = ResourceManager::GetShaderProgram("text");
     // NOTE: Another projection matrix. Why? Nobody knows
     auto projection2 = glm::ortho<f32>(0.0f, width, height, 0.0f);
@@ -89,7 +84,7 @@ Game::Game(ui32 width, ui32 height)
     m_levels.emplace_back("levels/4.lvl", width, height / 2);
 
     // SYSTEMS
-    m_particleGenerator = std::make_unique<ParticleGenerator>(particleShader, ResourceManager::GetTexture("particle"), 1500.0f);
+    m_particleGenerator = std::make_unique<ParticleGenerator>(ResourceManager::GetTexture("particle"), 1500.0f);
     m_postProcessor = std::make_unique<PostProcessor>(ResourceManager::GetShaderProgram("postprocess"), width, height);
     m_textRenderer = std::make_unique<TextRenderer>(textShader);
     m_textRenderer->Load("fonts/ocraext.ttf", 24);
@@ -102,7 +97,6 @@ Game::Game(ui32 width, ui32 height)
     m_ball = std::make_unique<BallObject>(ResourceManager::GetTexture("ball"), ballPosition, kBallRadius, kBallInitialVelocity);
 }
 
-//void Init();
 
 void Game::ProcessInput(f32 dt)
 {
@@ -319,28 +313,28 @@ void Game::spawnPowerUps(const GameObject& block)
     // 1 in 75 chance
     if (shouldSpawn(75)) {
         m_powerUps.emplace_back(PowerUp::Type::Speed, ResourceManager::GetTexture("powerup_speed"),
-                                0.0f, block.m_position, glm::vec3(0.5f, 0.5f, 1.0f));
+                                0.0f, block.m_position, glm::vec4(0.5f, 0.5f, 1.0f, 1.0f));
     }
     if (shouldSpawn(75)) {
         m_powerUps.emplace_back(PowerUp::Type::Sticky, ResourceManager::GetTexture("powerup_sticky"),
-                                20.0f, block.m_position, glm::vec3(1.0f, 0.5f, 1.0f));
+                                20.0f, block.m_position, glm::vec4(1.0f, 0.5f, 1.0f, 1.0f));
     }
     if (shouldSpawn(75)) {
         m_powerUps.emplace_back(PowerUp::Type::PassThrough, ResourceManager::GetTexture("powerup_passthrough"),
-                                10.0f, block.m_position, glm::vec3(0.5f, 1.0f, 0.5f));
+                                10.0f, block.m_position, glm::vec4(0.5f, 1.0f, 0.5f, 1.0f));
     }
     if (shouldSpawn(75)) {
         m_powerUps.emplace_back(PowerUp::Type::PadSizeIncrease, ResourceManager::GetTexture("powerup_increase"),
-                                0.0f, block.m_position, glm::vec3(1.0f, 0.6f, 0.4));
+                                0.0f, block.m_position, glm::vec4(1.0f, 0.6f, 0.4, 1.0f));
     }
     // Negative powerups should spawn more often
     if (shouldSpawn(15)) {
         m_powerUps.emplace_back(PowerUp::Type::Confuse, ResourceManager::GetTexture("powerup_confuse"),
-                                15.0f, block.m_position, glm::vec3(1.0f, 0.3f, 0.3f));
+                                15.0f, block.m_position, glm::vec4(1.0f, 0.3f, 0.3f, 1.0f));
     }
     if (shouldSpawn(15)) {
         m_powerUps.emplace_back(PowerUp::Type::Chaos, ResourceManager::GetTexture("powerup_chaos"),
-                                15.0f, block.m_position, glm::vec3(0.9f, 0.25f, 0.25f));
+                                15.0f, block.m_position, glm::vec4(0.9f, 0.25f, 0.25f, 1.0f));
     }
 }
 
@@ -360,14 +354,14 @@ void Game::updatePowerUps(f32 dt)
                     case PowerUp::Type::Sticky: {
                             if (isOtherPowerUpActive(PowerUp::Type::Sticky) == false) {
                                 m_ball->m_isSticky = false;
-                                m_player->m_color = glm::vec3(1.0f);
+                                m_player->m_color = glm::vec4(1.0f);
                             }
                             break;
                         }
                     case PowerUp::Type::PassThrough: {
                             if (isOtherPowerUpActive(PowerUp::Type::PassThrough) == false) {
                                 m_ball->m_passThrough = false;
-                                m_player->m_color = glm::vec3(1.0f);
+                                m_player->m_color = glm::vec4(1.0f);
                             }
                             break;
                         }
@@ -411,12 +405,12 @@ void Game::activatePowerUp(const PowerUp& powerUp)
             }
         case PowerUp::Type::Sticky: {
                 m_ball->m_isSticky = true;
-                m_player->m_color = glm::vec3(1.0f, 0.5f, 1.0f);
+                m_player->m_color = glm::vec4(1.0f, 0.5f, 1.0f, 1.0f);
                 break;
             }
         case PowerUp::Type::PassThrough: {
                 m_ball->m_passThrough = true;
-                m_player->m_color = glm::vec3(1.0f, 0.5f, 0.5f);
+                m_player->m_color = glm::vec4(1.0f, 0.5f, 0.5f, 1.0f);
                 break;
             }
         case PowerUp::Type::PadSizeIncrease: {

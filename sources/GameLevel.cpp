@@ -23,7 +23,7 @@ GameLevel::GameLevel(const char* levelPath, ui32 levelWidth, ui32 levelHeight)
     levelDataToGameObjects(levelData, levelWidth, levelHeight);
 }
 
-void GameLevel::Draw(/*const SpriteRenderer& renderer*/) const
+void GameLevel::Draw() const
 {
     for (const auto& brick : m_bricks) {
         if (brick.m_isDestroyed == false) {
@@ -70,16 +70,16 @@ void GameLevel::levelDataToGameObjects(const std::vector<std::vector<ui32>>& lev
             const auto block = levelData.at(y).at(x);// [y] [x] ;
 
             if (block == 1) {
-                constexpr auto color = glm::vec3(0.8f, 0.8f, 0.7f);
+                constexpr auto color = glm::vec4(0.8f, 0.8f, 0.7f, 1.0f);
                 m_bricks.emplace_back(blockSolidTexture, true, position, size, color);
                 //
             } else if (block > 1) {
-                auto color = glm::vec3(1.0f);
+                auto color = glm::vec4(1.0f);
                 switch (block) {
-                    case 2: color = glm::vec3(0.2f, 0.6f, 1.0f); break;
-                    case 3: color = glm::vec3(0.0f, 0.7f, 0.0f); break;
-                    case 4: color = glm::vec3(0.8f, 0.8f, 0.4f); break;
-                    case 5: color = glm::vec3(1.0f, 0.5f, 0.0f); break;
+                    case 2: color = glm::vec4(0.2f, 0.6f, 1.0f, 1.0f); break;
+                    case 3: color = glm::vec4(0.0f, 0.7f, 0.0f, 1.0f); break;
+                    case 4: color = glm::vec4(0.8f, 0.8f, 0.4f, 1.0f); break;
+                    case 5: color = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f); break;
                 }
                 m_bricks.emplace_back(blockTexture, false, position, size, color);
             }

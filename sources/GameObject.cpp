@@ -5,7 +5,7 @@
 
 GameObject::GameObject(const GLTexture& texture, bool isSolid,
                        glm::vec2 position, glm::vec2 size,
-                       glm::vec3 color /*= glm::vec3(1.0f)*/, glm::vec2 velocity /*= glm::vec2(0.0f)*/)
+                       glm::vec4 color /*= glm::vec3(1.0f)*/, glm::vec2 velocity /*= glm::vec2(0.0f)*/)
     : m_texture(texture)
     , m_position(position)
     , m_size(size)

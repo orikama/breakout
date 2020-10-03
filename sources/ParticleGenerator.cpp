@@ -2,30 +2,16 @@
 
 #include "Graphics/Renderer2D.hpp"
 
-#include <glad/glad.h>
-
 #include <cstdlib>
 
 
-ParticleGenerator::ParticleGenerator(const GLShaderProgram& shaderProgram, const GLTexture& texture, ui32 amountOfParticles)
-    : m_shaderProgram(shaderProgram)
-    , m_texture(texture)
+ParticleGenerator::ParticleGenerator(const GLTexture& texture, ui32 amountOfParticles)
+    : m_texture(texture)
     , m_amountOfParticles(amountOfParticles)
 {
     m_particles.resize(amountOfParticles);
-
-    const f32 vertices[] = {
-        0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
-
-        0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 1.0f, 1.0f, 1.0f,
-        1.0f, 0.0f, 1.0f, 0.0f
-    };
-
-    m_quadVertices = GLBuffer(sizeof(vertices), vertices);
 }
+
 
 void ParticleGenerator::Update(f32 dt, const GameObject& obj, ui32 newParticles, glm::vec2 offset /*= { 0.0f, 0.0f }*/)
 {
@@ -46,24 +32,17 @@ void ParticleGenerator::Update(f32 dt, const GameObject& obj, ui32 newParticles,
 
 void ParticleGenerator::Draw() const
 {
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-    m_shaderProgram.Bind();
-    m_texture.Bind(0);
-    m_quadVertices.Bind();
+    Renderer2D::SetBlendFunction(Renderer2D::BlendFactor::SrcAlpha, Renderer2D::BlendFactor::One);
 
     for (const auto& particle : m_particles) {
         if (particle.life > 0.0f) {
-            m_shaderProgram.SetFloat2("u_offset", particle.position);
-            m_shaderProgram.SetFloat4("u_color", particle.color);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
+            Renderer2D::DrawQuad(m_texture, particle.position, glm::vec2(10.0f), 0.0f, particle.color);
         }
     }
 
-    //glBindVertexArray(0);
     // NOTE: I guess technically I should first backup old glBlendFunc state (through glGet()),
     //  set new one and at the end reset it to previous one
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    Renderer2D::SetBlendFunction(Renderer2D::BlendFactor::SrcAlpha, Renderer2D::BlendFactor::OneMinusSrcAlpha);
 }
 
 

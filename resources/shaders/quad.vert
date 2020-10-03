@@ -1,11 +1,11 @@
 #version 450
 
-layout(location = 0) in vec4 in_vertex; // <vec2 position, vec2 textCoords>
+in  layout(location = 0) vec4 in_vertex; // <vec2 position, vec2 textCoords>
 
-layout(location = 0) out vec2 out_textureCoord;
+out layout(location = 0) vec2 out_textureCoord;
 
-uniform mat4 u_model;
 uniform mat4 u_projection;
+uniform mat4 u_model;
 
 
 void main()

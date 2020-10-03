@@ -76,6 +76,11 @@ void GLBackend::SetClearColor(f32 r, f32 g, f32 b, f32 a)
     glClearColor(r, g, b, a);
 }
 
+void GLBackend::SetBlendFunction(GLBlendFactor source, GLBlendFactor destination)
+{
+    glBlendFunc(static_cast<ui32>(source), static_cast<ui32>(destination));
+}
+
 
 void GLBackend::Clear(ui32 mask)
 {

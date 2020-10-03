@@ -1,8 +1,6 @@
 #pragma once
 
 #include "core.hpp"
-#include "Graphics/OpenGL/GLBuffer.hpp"
-#include "Graphics/OpenGL/GLShaderProgram.hpp"
 #include "Graphics/OpenGL/GLTexture.hpp"
 #include "GameObject.hpp"
 
@@ -16,7 +14,7 @@
 class ParticleGenerator
 {
 public:
-    ParticleGenerator(const GLShaderProgram& shaderProgram, const GLTexture& texture, ui32 amountOfParticles);
+    ParticleGenerator(const GLTexture& texture, ui32 amountOfParticles);
 
     void Update(f32 dt, const GameObject& obj, ui32 newParticles, glm::vec2 offset = { 0.0f, 0.0f });
     void Draw() const;
@@ -37,9 +35,7 @@ private:
     void respawnParticle(Particle& particle, const GameObject& obj, glm::vec2 offset);
 
 
-    const GLShaderProgram& m_shaderProgram;
     const GLTexture& m_texture;
-    GLBuffer m_quadVertices;
 
     std::vector<Particle> m_particles;
     ui32 m_amountOfParticles;

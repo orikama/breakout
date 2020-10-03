@@ -5,7 +5,7 @@
 #include "Graphics/OpenGL/GLTexture.hpp"
 #include "GameObject.hpp"
 
-#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 
 class PowerUp : public GameObject
@@ -21,5 +21,5 @@ public:
     bool m_isActive = false;
 
 
-    PowerUp(Type type, const GLTexture& texture, f32 duration, glm::vec2 position, glm::vec3 color);
+    PowerUp(Type type, const GLTexture& texture, f32 duration, glm::vec2 position, glm::vec4 color);
 };

@@ -7,7 +7,7 @@
 //{}
 
 BallObject::BallObject(const GLTexture& texture, glm::vec2 position, f32 radius, glm::vec2 velocity)
-    : GameObject(texture, false, position, glm::vec2(radius * 2.0f), glm::vec3(1.0f), velocity)
+    : GameObject(texture, false, position, glm::vec2(radius * 2.0f), glm::vec4(1.0f), velocity)
     , m_radius(radius)
 {}
 
